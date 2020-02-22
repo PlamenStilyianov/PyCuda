@@ -1,9 +1,9 @@
-import pycuda
-import pycuda.driver as drv
+from pycuda import driver as drv
+import pycuda.autoinit
 
 drv.init()
 
-print('CUDA device query (PyCUDA version) \n')
+print('CUDA device query (PyCUDA version {}) (PyCUDA Toolkit version {}.{}) \n'.format(pycuda.VERSION_TEXT, pycuda.driver.get_version()[0],pycuda.driver.get_version()[1]))
 
 print('Detected {} CUDA Capable device(s) \n'.format(drv.Device.count()))
 
