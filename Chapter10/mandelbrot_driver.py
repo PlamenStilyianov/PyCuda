@@ -1,10 +1,15 @@
 from __future__ import division
 from time import time
 import matplotlib
+import pycuda
+import pycuda.autoinit
 from matplotlib import pyplot as plt
 import numpy as np
+from Chapter10.cuda_driver import *
 
 
+mandel_mod = pycuda.driver.module_from_file('./mandelbrot.ptx')
+mandel_ker = mandel_mod.get_function('mandelbrot_ker')
 
 def mandelbrot(breadth, low, high, max_iters, upper_bound):
     cuInit(0)
@@ -23,7 +28,8 @@ def mandelbrot(breadth, low, high, max_iters, upper_bound):
     cuCtxCreate(byref(cuContext), 0, cuDevice)
 
     cuModule = c_void_p()
-    cuModuleLoad(byref(cuModule), c_char_p('./mandelbrot.ptx'))
+
+    cuModuleLoad(byref(cuModule), c_char_p(id(mandel_mod)))
 
     lattice = np.linspace(low, high, breadth, dtype=np.float32)
     lattice_c = lattice.ctypes.data_as(POINTER(c_float))
@@ -40,7 +46,7 @@ def mandelbrot(breadth, low, high, max_iters, upper_bound):
     cuMemcpyHtoD(lattice_gpu, lattice_c, c_size_t(lattice.size*sizeof(c_float)))
 
     mandel_ker = c_void_p(0)
-    cuModuleGetFunction(byref(mandel_ker), cuModule, c_char_p('mandelbrot_ker'))
+    cuModuleGetFunction(byref(mandel_ker), cuModule, c_char_p(id(mandel_ker)))
 
     max_iters = c_int(max_iters)
     upper_bound_squared = c_float(upper_bound**2)
