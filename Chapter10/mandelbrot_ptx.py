@@ -1,12 +1,11 @@
 from __future__ import division
-from time import time
-import matplotlib
-from matplotlib import pyplot as plt
-import numpy as np
-import pycuda
-from pycuda import gpuarray
-import pycuda.autoinit
 
+from time import time
+
+import numpy as np
+import pycuda.autoinit
+from matplotlib import pyplot as plt
+from pycuda import gpuarray
 
 mandel_mod = pycuda.driver.module_from_file('./mandelbrot.ptx')
 mandel_ker = mandel_mod.get_function('mandelbrot_ker')
